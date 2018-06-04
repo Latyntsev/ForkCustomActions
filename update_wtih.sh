@@ -6,14 +6,10 @@ echo $1
 echo $branch
 
 git stash
-git checkout $1 -q && \
-sleep 1 && \
-git pull && \
-sleep 1 && \
-git checkout $branch && \
-sleep 1 && \
-git pull && \
-sleep 1 && \
+git checkout $1 -q
+git pull
+git checkout $branch
+git pull
 git merge $1 --commit --no-ff --no-edit --no-squash
 git stash pop
 
