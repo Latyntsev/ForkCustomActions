@@ -6,7 +6,7 @@ repo_name=$(git config --get remote.origin.url | cut -d ":" -f 2 | cut -d "." -f
 echo $1
 echo $branch
 echo $repo_name
-
+git push
 if [ ! -z "$1" ]; then
 	open https://github.com/$repo_name/compare/$1...$branch?expand=1
 else
