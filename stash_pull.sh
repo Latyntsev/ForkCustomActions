@@ -1,5 +1,13 @@
 #!/bin/bash
 
-git stash
+diff=$(git diff)
+
+if [ ! -z "$diff" ]; then
+	git stash
+fi
+
 git pull
-git stash pop
+
+if [ ! -z "$diff" ]; then
+	git stash pop
+fi
