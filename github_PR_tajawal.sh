@@ -4,7 +4,7 @@ git push
 
 base_branch=$1
 branch=$(git rev-parse --abbrev-ref HEAD)
-response=$(curl -s "$tajawal_jira_url/rest/api/2/issue/$branch" -u "$tajawal_jira_access_token" | sed 's#\\n##g;s#\\#\\\\#g')
+response=$(curl -s "${tajawal_jira_url}/rest/api/2/issue/$branch" -u "$tajawal_jira_access_token" | sed 's#\\n##g;s#\\#\\\\#g')
 
 title=$(echo $response | jq -r '.fields.summary')
 type=$(echo $response | jq -r '.fields.issuetype.name')
@@ -32,11 +32,22 @@ fi
 
 
 # add PR title
-echo "$branch $title" > PR_MESSAGE
+if [ "$title" != "null" ]; then
+	echo "$branch $title" > PR_MESSAGE
+else
+	git log -n 10 | grep $branch | head -1 | sed "s#    IOS-##g" > PR_MESSAGE
+fi
 echo "" >> PR_MESSAGE
 
+
 # Build PR description
-cat .github/PULL_REQUEST_TEMPLATE.md | sed "s/<\!-- https/**[$branch $title](https/;s/IOS-XXXX. -->/$branch)**/" >> PR_MESSAGE 
+if [ "$title" != "null" ]; then
+	cat .github/PULL_REQUEST_TEMPLATE.md | sed "s/<\!-- https/**[$branch $title](https/;s/IOS-XXXX. -->/$branch)**/" >> PR_MESSAGE 
+else
+	cat .github/PULL_REQUEST_TEMPLATE.md  >> PR_MESSAGE 
+fi
+
+
 
 git log -n 10 | grep $branch | sed "s#    $branch#*#g" > IMPLEMENTATION_DETAILS
 sed -i -e '/Implementation Details/r IMPLEMENTATION_DETAILS' PR_MESSAGE
