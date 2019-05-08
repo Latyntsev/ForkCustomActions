@@ -42,7 +42,7 @@ echo "" >> PR_MESSAGE
 # Build PR description
 cat .github/PULL_REQUEST_TEMPLATE.md  >> PR_MESSAGE
 
-echo "[$branch $title]($tajawal_jira_url/browse/$branch)" > TMP
+echo "[**$branch $title**]($tajawal_jira_url/browse/$branch)" > TMP
 sed -i -e '/Story Link/r TMP' PR_MESSAGE
 
 git log -n 10 | grep $branch | sed "s#    $branch#*#g" > TMP
