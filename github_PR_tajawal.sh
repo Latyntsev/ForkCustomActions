@@ -50,9 +50,9 @@ sed -i -e '/Implementation Details/r TMP' PR_MESSAGE
 
 cat PR_MESSAGE
 if [ -z "$label" ]; then
-	# hub pull-request -b $base_branch -F PR_MESSAGE --no-edit -o -r $reviewers -a $assign
+	hub pull-request -b $base_branch -F PR_MESSAGE --no-edit -o -r $reviewers -a $assign
 else
-	# hub pull-request -b $base_branch -F PR_MESSAGE --no-edit -o -r $reviewers -a $assign -l $label
+	hub pull-request -b $base_branch -F PR_MESSAGE --no-edit -o -r $reviewers -a $assign -l $label
 fi
 
 rm -f PR_MESSAGE
