@@ -12,7 +12,7 @@ type=$(echo $response | jq -r '.fields.issuetype.name')
 assign="latyntsev"
 reviewers="mohammad19991,thahirtajawal,Haneef-Habib"
 if [ "$type" = "Story" ]; then
-	label='"Story Done"'
+	label='Story Done'
 fi
 if [ "$type" = "Sub-task" ] || [ "$type" = "Task" ]; then
 	label='Sub-task'
@@ -30,7 +30,6 @@ if [[ "$base_branch" == *"release"* ]]; then
 fi
 
 
-
 # add PR title
 if [ "$title" != "null" ]; then
 	echo "$branch $title" > PR_MESSAGE
@@ -41,24 +40,22 @@ echo "" >> PR_MESSAGE
 
 
 # Build PR description
-if [ "$title" != "null" ]; then
-	cat .github/PULL_REQUEST_TEMPLATE.md | sed "s/<\!-- https/**[$branch $title](https/;s/IOS-XXXX. -->/$branch)**/" >> PR_MESSAGE 
-else
-	cat .github/PULL_REQUEST_TEMPLATE.md  >> PR_MESSAGE 
-fi
+cat .github/PULL_REQUEST_TEMPLATE.md  >> PR_MESSAGE
 
+echo "[$branch $title]($tajawal_jira_url/browse/$branch)" > TMP
+sed -i -e '/Story Link/r TMP' PR_MESSAGE
 
+git log -n 10 | grep $branch | sed "s#    $branch#*#g" > TMP
+sed -i -e '/Implementation Details/r TMP' PR_MESSAGE
 
-git log -n 10 | grep $branch | sed "s#    $branch#*#g" > IMPLEMENTATION_DETAILS
-sed -i -e '/Implementation Details/r IMPLEMENTATION_DETAILS' PR_MESSAGE
-
+cat PR_MESSAGE
 if [ -z "$label" ]; then
-	hub pull-request -b $base_branch -F PR_MESSAGE --no-edit -o -r $reviewers -a $assign
+	# hub pull-request -b $base_branch -F PR_MESSAGE --no-edit -o -r $reviewers -a $assign
 else
-	hub pull-request -b $base_branch -F PR_MESSAGE --no-edit -o -r $reviewers -a $assign -l $label
+	# hub pull-request -b $base_branch -F PR_MESSAGE --no-edit -o -r $reviewers -a $assign -l $label
 fi
 
 rm -f PR_MESSAGE
 rm -f PR_MESSAGE-e
 rm -f PR_MESSAGE_DESCRIPTION
-rm -f IMPLEMENTATION_DETAILS
+rm -f TMP
