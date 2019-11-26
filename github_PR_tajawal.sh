@@ -6,7 +6,7 @@ base_branch=$1
 branch=$(git rev-parse --abbrev-ref HEAD)
 response=$(curl -s "${tajawal_jira_url}/rest/api/2/issue/$branch" -u "$tajawal_jira_access_token" | sed 's#\\n##g;s#\\#\\\\#g')
 
-title=$(echo $response | jq -r '.fields.summary')
+title=$(echo $response | jq -r '.fields.summary' | tr -d '[:space:]')
 type=$(echo $response | jq -r '.fields.issuetype.name')
 
 assign="${tajawal_github_author}"
