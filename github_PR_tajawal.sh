@@ -9,8 +9,8 @@ response=$(curl -s "${tajawal_jira_url}/rest/api/2/issue/$branch" -u "$tajawal_j
 title=$(echo $response | jq -r '.fields.summary')
 type=$(echo $response | jq -r '.fields.issuetype.name')
 
-assign="latyntsev"
-reviewers="mohammad19991,thahirtajawal,Haneef-Habib"
+assign="${tajawal_github_author}"
+reviewers="${tajawal_github_reviewers}"
 if [ "$type" = "Story" ]; then
 	label='Story Done'
 fi
