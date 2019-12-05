@@ -2,9 +2,12 @@
 source ~/.bash_profile
 git push
 
-base_branch=$1
 branch=$(git rev-parse --abbrev-ref HEAD)
 response=$(curl -s "${tajawal_jira_url}/rest/api/2/issue/$branch" -u "$tajawal_jira_access_token" | sed 's#\\n##g;s#\\#\\\\#g')
+base_branch=$1
+if [ -z "$base_branch" ]; then
+    base_branch=$(echo $response | jq -r '.fields.parent.key')
+fi
 
 title=$(echo $response | jq -r '.fields.summary' | sed 's/^[ ]*//;s/[ ]*$//')
 type=$(echo $response | jq -r '.fields.issuetype.name')
