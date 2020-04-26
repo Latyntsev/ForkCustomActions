@@ -4,11 +4,17 @@ git push
 
 branch=$(git rev-parse --abbrev-ref HEAD)
 
-base_branch=$(git show-branch -a 2>/dev/null \
-| grep '\*' \
-| grep -v `git rev-parse --abbrev-ref HEAD` \
-| head -n1 \
-| perl -ple 's/\[[A-Za-z]+-\d+\][^\]]+$//; s/^.*\[([^~^\]]+).*$/$1/')
+
+
+if [ -n "$1" ]; then 
+	base_branch=$1
+else 
+	base_branch=$(git show-branch -a 2>/dev/null \
+	| grep '\*' \
+	| grep -v `git rev-parse --abbrev-ref HEAD` \
+	| head -n1 \
+	| perl -ple 's/\[[A-Za-z]+-\d+\][^\]]+$//; s/^.*\[([^~^\]]+).*$/$1/')
+fi
 
 response=$(curl -s "${tajawal_jira_url}/rest/api/2/issue/$branch" -u "$tajawal_jira_access_token" | sed 's#\\n##g;s#\\#\\\\#g')
 
