@@ -3,8 +3,15 @@ source ~/.bash_profile
 git push
 
 branch=$(git rev-parse --abbrev-ref HEAD)
+
+base_branch=$(git show-branch -a 2>/dev/null \
+| grep '\*' \
+| grep -v `git rev-parse --abbrev-ref HEAD` \
+| head -n1 \
+| perl -ple 's/\[[A-Za-z]+-\d+\][^\]]+$//; s/^.*\[([^~^\]]+).*$/$1/')
+
 response=$(curl -s "${tajawal_jira_url}/rest/api/2/issue/$branch" -u "$tajawal_jira_access_token" | sed 's#\\n##g;s#\\#\\\\#g')
-base_branch=$1
+
 if [ -z "$base_branch" ]; then
     base_branch=$(echo $response | jq -r '.fields.parent.key')
 fi
