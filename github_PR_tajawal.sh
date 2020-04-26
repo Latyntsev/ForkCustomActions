@@ -5,8 +5,13 @@ git push
 branch=$(git rev-parse --abbrev-ref HEAD)
 response=$(curl -s "${tajawal_jira_url}/rest/api/2/issue/$branch" -u "$tajawal_jira_access_token" | sed 's#\\n##g;s#\\#\\\\#g')
 base_branch=$1
+
 if [ -z "$base_branch" ]; then
-    base_branch=$(echo $response | jq -r '.fields.parent.key')
+	base_branch=$(git show-branch | grep '*' | grep -v "$(git rev-parse --abbrev-ref HEAD)" | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//')
+fi
+
+if [ "$base_branch" = "--legacy" ]; then 
+	base_branch=$(echo $response | jq -r '.fields.parent.key')
 fi
 
 title=$(echo $response | jq -r '.fields.summary' | sed 's/^[ ]*//;s/[ ]*$//')
