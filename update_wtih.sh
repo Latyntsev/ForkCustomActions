@@ -2,11 +2,10 @@
 
 branch=$(git rev-parse --abbrev-ref HEAD)
 diff=$(git diff)
+base_branch=$1
 
-if [ -n "$1" ]; then 
-	base_branch=$1
-else 
-    base_branch=$(git show-branch | grep '*' | grep -v "$(git rev-parse --abbrev-ref HEAD)" | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//')
+if [ -z "$base_branch" ]; then
+	base_branch=$(git show-branch | grep '*' | grep -v "$(git rev-parse --abbrev-ref HEAD)" | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//')
 fi
 
 echo $base_branch
