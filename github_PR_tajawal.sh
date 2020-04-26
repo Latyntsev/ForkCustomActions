@@ -3,6 +3,7 @@ source ~/.bash_profile
 git push
 
 branch=$(git rev-parse --abbrev-ref HEAD)
+
 base_branch=$1
 
 response=$(curl -s "${tajawal_jira_url}/rest/api/2/issue/$branch" -u "$tajawal_jira_access_token" | sed 's#\\n##g;s#\\#\\\\#g')
