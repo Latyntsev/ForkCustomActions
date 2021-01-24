@@ -1,5 +1,7 @@
 #!/bin/zsh
 source ~/.bash_profile
+source ~/.zshrc
+
 git push
 
 branch=$(git rev-parse --abbrev-ref HEAD)
@@ -38,15 +40,6 @@ if [[ "$base_branch" == *"release"* ]]; then
 fi
 
 
-# add PR title
-if [ "$title" != "null" ]; then
-	echo "$branch $title" > PR_MESSAGE
-else
-	git log -n 10 | grep $branch | head -1 | sed "s#    IOS-##g" > PR_MESSAGE
-fi
-echo "" >> PR_MESSAGE
-
-
 # Build PR description
 cat .github/PULL_REQUEST_TEMPLATE.md  >> PR_MESSAGE
 
@@ -57,10 +50,13 @@ git log -n 10 | grep $branch | sed "s#    $branch#*#g" > TMP
 sed -i -e '/Implementation Details/r TMP' PR_MESSAGE
 
 cat PR_MESSAGE
+
+body=$(cat PR_MESSAGE)
+
 if [ -z "$label" ]; then
-	hub pull-request -b $base_branch -F PR_MESSAGE --no-edit -o -r $reviewers -a $assign
+	gh pr create --base $base_branch --title "$branch $title" --body "$body" --reviewer $reviewers --assignee $assign
 else
-	hub pull-request -b $base_branch -F PR_MESSAGE --no-edit -o -r $reviewers -a $assign -l $label
+	gh pr create --base $base_branch --title "$branch $title" --body "$body" --reviewer $reviewers --assignee $assign -l $label
 fi
 
 rm -f PR_MESSAGE
