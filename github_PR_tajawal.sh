@@ -54,9 +54,23 @@ cat PR_MESSAGE
 body=$(cat PR_MESSAGE)
 
 if [ -z "$label" ]; then
-	gh pr create --base $base_branch --title "$branch $title" --body "$body" --reviewer $reviewers --assignee $assign
+	pr=$(gh pr create --base $base_branch --title "$branch $title" --body "$body" --reviewer $reviewers --assignee $assign)
 else
-	gh pr create --base $base_branch --title "$branch $title" --body "$body" --reviewer $reviewers --assignee $assign -l $label
+	pr=$(gh pr create --base $base_branch --title "$branch $title" --body "$body" --reviewer $reviewers --assignee $assign -l $label)
+fi
+
+# Build Slack message
+if [ -n "$pr" ]; then
+message=$(< .github/SLACK_MESSAGE_TEMPLATE.json)
+message="${message//PULL_REQUEST_URL/$pr}"
+message="${message//ASSIGNEE/$assign}"
+message="${message//BRANCH/$branch}"
+message="${message//TITLE/$title}"
+message="${message//LABEL/$label}"
+
+hook=$(< .github/PULL_REQUESTS_WEBHOOK.txt)
+
+curl -X POST -H 'Content-type: application/json' --data $message $hook
 fi
 
 rm -f PR_MESSAGE
